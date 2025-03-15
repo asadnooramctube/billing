@@ -20,6 +20,7 @@
             <button onclick="showSection('productManagement')">প্রোডাক্ট ম্যানেজমেন্ট</button>
             <button onclick="showSection('wholesale')">পাইকারি বিক্রি</button>
             <button onclick="showSection('salesHistory')">বিক্রির হিসাব</button>
+            <button onclick="showSection('stockManagement')">স্টক আছে</button>
         </aside>
 
         <!-- মেইন কন্টেন্ট -->
@@ -61,6 +62,7 @@
                 <input type="text" id="productName" placeholder="পণ্যের নাম">
                 <input type="number" id="productPrice" placeholder="মূল্য">
                 <input type="file" id="productImage">
+                <input type="number" id="productStock" placeholder="স্টক পরিমাণ">
                 <button onclick="addProduct()">নতুন পণ্য যোগ করুন</button>
                 <h3>প্রোডাক্ট তালিকা</h3>
                 <div id="productList"></div>
@@ -106,6 +108,13 @@
                 <button onclick="showDailySales()">দৈনিক হিসাব</button>
                 <button onclick="showMonthlySales()">মাসিক হিসাব</button>
                 <div id="salesReport"></div>
+            </section>
+
+            <!-- স্টক ম্যানেজমেন্ট -->
+            <section id="stockManagement" class="hidden">
+                <h2>স্টক আছে</h2>
+                <input type="text" id="searchStock" placeholder="পন্য খুঁজুন" oninput="searchStock()">
+                <div id="stockList"></div>
             </section>
         </main>
     </div>
