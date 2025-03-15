@@ -16,6 +16,8 @@ function showSection(sectionId) {
         updateProductList();
     } else if (sectionId === 'salesHistory') {
         showSalesHistory();
+    } else if (sectionId === 'stockManagement') {
+        updateStockList();
     }
 }
 
@@ -23,20 +25,22 @@ function addProduct() {
     const name = document.getElementById('productName').value;
     const price = document.getElementById('productPrice').value;
     const image = document.getElementById('productImage').files[0];
+    const stock = parseInt(document.getElementById('productStock').value);
 
-    if (name && price && image) {
+    if (name && price && image && stock >= 0) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            const product = { name, price, image: e.target.result };
+            const product = { name, price, image: e.target.result, stock };
             products.push(product);
             localStorage.setItem('products', JSON.stringify(products));
             updateProductList();
             updateProductDropdownSales();
             updateProductDropdownWholesale();
+            updateStockList();
         };
         reader.readAsDataURL(image);
     } else {
-        alert('পণ্যের নাম, মূল্য এবং ছবি অবশ্যই দিতে হবে!');
+        alert('পণ্যের নাম, মূল্য, ছবি এবং স্টক পরিমাণ অবশ্যই দিতে হবে!');
     }
 }
 
@@ -47,7 +51,7 @@ function updateProductList() {
         productList.innerHTML += `
             <div>
                 <img src="${product.image}" alt="${product.name}" width="50">
-                ${product.name} - ${product.price} টাকা
+                ${product.name} - ${product.price} টাকা - স্টক: ${product.stock} টি
                 <button onclick="deleteProduct(${index})">ডিলিট</button>
             </div>
         `;
@@ -61,6 +65,7 @@ function deleteProduct(index) {
         updateProductList();
         updateProductDropdownSales();
         updateProductDropdownWholesale();
+        updateStockList();
     }
 }
 
@@ -107,9 +112,16 @@ function addToCartSales() {
 
     if (productIndex && quantity > 0 && customerName) {
         const product = products[productIndex];
-        const totalPrice = product.price * quantity;
-        cartSales.push({ ...product, quantity, totalPrice, customerName });
-        updateCartSales();
+        if (product.stock >= quantity) {
+            const totalPrice = product.price * quantity;
+            cartSales.push({ ...product, quantity, totalPrice, customerName });
+            product.stock -= quantity;
+            localStorage.setItem('products', JSON.stringify(products));
+            updateCartSales();
+            updateStockList();
+        } else {
+            alert('স্টকে পর্যাপ্ত পণ্য নেই!');
+        }
     } else {
         alert('পণ্য, পরিমাণ এবং কাস্টমারের নাম সঠিকভাবে নির্বাচন করুন!');
     }
@@ -147,8 +159,14 @@ function updateCartSales() {
 }
 
 function removeFromCartSales(index) {
-    cartSales.splice(index, 1);
+    const removedItem = cartSales.splice(index, 1)[0];
+    const product = products.find(p => p.name === removedItem.name);
+    if (product) {
+        product.stock += removedItem.quantity;
+        localStorage.setItem('products', JSON.stringify(products));
+    }
     updateCartSales();
+    updateStockList();
 }
 
 function generateBillSales() {
@@ -275,7 +293,197 @@ function displaySalesReport(sales) {
     });
 }
 
+// স্টক ম্যানেজমেন্ট
+function updateStockList() {
+    const stockList = document.getElementById('stockList');
+    stockList.innerHTML = '';
+    products.forEach((product, index) => {
+        stockList.innerHTML += `
+            <div>
+                ${product.name} - ${product.stock} টি
+                <button onclick="editStock(${index})">স্টক এডিট</button>
+            </div>
+        `;
+    });
+}
+
+function editStock(index) {
+    const newStock = parseInt(prompt('নতুন স্টক পরিমাণ লিখুন:'));
+    if (newStock >= 0) {
+        products[index].stock = newStock;
+        localStorage.setItem('products', JSON.stringify(products));
+        updateStockList();
+    } else {
+        alert('স্টক পরিমাণ সঠিকভাবে লিখুন!');
+    }
+}
+
+function searchStock() {
+    const searchTerm = document.getElementById('searchStock').value.toLowerCase();
+    const filteredStock = products.filter(product => product.name.toLowerCase().includes(searchTerm));
+    const stockList = document.getElementById('stockList');
+    stockList.innerHTML = '';
+    filteredStock.forEach((product, index) => {
+        stockList.innerHTML += `
+            <div>
+                ${product.name} - ${product.stock} টি
+                <button onclick="editStock(${index})">স্টক এডিট</button>
+            </div>
+        `;
+    });
+}
+
+// পাইকারি বিক্রি
+function addToCartWholesale() {
+    const productIndex = document.getElementById('productSelectWholesale').value;
+    const quantity = document.getElementById('quantityWholesale').value;
+    const customerName = document.getElementById('customerNameWholesale').value;
+    const customPrice = document.getElementById('customPriceWholesale').value;
+
+    if (productIndex && quantity > 0 && customerName) {
+        const product = products[productIndex];
+        if (product.stock >= quantity) {
+            const totalPrice = (customPrice || product.price) * quantity;
+            cartWholesale.push({ ...product, quantity, totalPrice, customerName, customPrice });
+            product.stock -= quantity;
+            localStorage.setItem('products', JSON.stringify(products));
+            updateCartWholesale();
+            updateStockList();
+        } else {
+            alert('স্টকে পর্যাপ্ত পণ্য নেই!');
+        }
+    } else {
+        alert('পণ্য, পরিমাণ এবং কাস্টমারের নাম সঠিকভাবে নির্বাচন করুন!');
+    }
+}
+
+function addCustomProductWholesale() {
+    const name = document.getElementById('customProductNameWholesale').value;
+    const price = document.getElementById('customProductPriceWholesale').value;
+    const quantity = document.getElementById('customProductQuantityWholesale').value;
+    const customerName = document.getElementById('customerNameWholesale').value;
+
+    if (name && price && quantity && customerName) {
+        const totalPrice = price * quantity;
+        cartWholesale.push({ name, price, quantity, totalPrice, customerName });
+        updateCartWholesale();
+    } else {
+        alert('কাস্টম পণ্যের নাম, দাম, পরিমাণ এবং কাস্টমারের নাম সঠিকভাবে লিখুন!');
+    }
+}
+
+function updateCartWholesale() {
+    const cartItems = document.getElementById('cartItemsWholesale');
+    cartItems.innerHTML = '';
+    let totalAmount = 0;
+    cartWholesale.forEach((item, index) => {
+        cartItems.innerHTML += `
+            <div>
+                ${item.name} x${item.quantity} - ${item.totalPrice} টাকা
+                <button onclick="removeFromCartWholesale(${index})">রিমুভ</button>
+            </div>
+        `;
+        totalAmount += item.totalPrice;
+    });
+    document.getElementById('totalAmountWholesale').innerText = `মোট মূল্য: ${totalAmount} টাকা`;
+}
+
+function removeFromCartWholesale(index) {
+    const removedItem = cartWholesale.splice(index, 1)[0];
+    const product = products.find(p => p.name === removedItem.name);
+    if (product) {
+        product.stock += removedItem.quantity;
+        localStorage.setItem('products', JSON.stringify(products));
+    }
+    updateCartWholesale();
+    updateStockList();
+}
+
+function generateBillWholesale() {
+    const customerName = document.getElementById('customerNameWholesale').value;
+    const discount = parseFloat(document.getElementById('discountWholesale').value) || 0;
+
+    if (cartWholesale.length === 0 || !customerName) {
+        alert('কার্টে পণ্য যোগ করুন এবং কাস্টমারের নাম লিখুন!');
+        return;
+    }
+
+    const totalAmount = cartWholesale.reduce((sum, item) => sum + item.totalPrice, 0);
+    const discountedAmount = totalAmount - discount;
+
+    const billContent = `
+        <h1>মা ডিজিটাল স্টুডিও</h1>
+        <p>ধলাপাড়া বাজার, ঘাটাইল, টাংগাইল</p>
+        <p>মোবাইল: +8801710-065644</p>
+        <h2>বিল</h2>
+        <p>কাস্টমার: ${customerName}</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>পণ্যের নাম</th>
+                    <th>পরিমাণ</th>
+                    <th>মূল্য</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${cartWholesale.map(item => `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>${item.quantity}</td>
+                        <td>${item.totalPrice} টাকা</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+        <h3>মোট টাকা: ${totalAmount} টাকা</h3>
+        <h3>ডিসকাউন্ট: ${discount} টাকা</h3>
+        <h3>মোট প্রদেয়: ${discountedAmount} টাকা</h3>
+    `;
+
+    const printWindow = window.open('', '', 'width=800,height=600');
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>বিল</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; padding: 20px; }
+                    h1, h2, h3 { color: #333; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    table, th, td { border: 1px solid #ddd; }
+                    th, td { padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                </style>
+            </head>
+            <body>
+                ${billContent}
+            </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+
+    // বিক্রির হিসাবে সংরক্ষণ
+    const sale = {
+        date: new Date().toLocaleString(),
+        customerName,
+        items: cartWholesale,
+        totalAmount,
+        discount,
+        discountedAmount
+    };
+    salesHistory.push(sale);
+    localStorage.setItem('salesHistory', JSON.stringify(salesHistory));
+
+    clearCartWholesale();
+}
+
+function clearCartWholesale() {
+    cartWholesale = [];
+    updateCartWholesale();
+}
+
 // Initialize
 showSection('sales');
 updateProductDropdownSales();
 updateProductDropdownWholesale();
+updateStockList();
