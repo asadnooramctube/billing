@@ -1,0 +1,102 @@
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #00c853, #b2ff59);
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    text-align: center;
+    background: #009624;
+    color: white;
+    padding: 10px;
+}
+
+.container {
+    display: flex;
+}
+
+aside {
+    width: 20%;
+    background: #f4f4f4;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+aside button {
+    background: yellow;
+    border: none;
+    padding: 10px;
+    margin: 5px 0;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+main {
+    width: 80%;
+    padding: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+h2 {
+    background: yellow;
+    padding: 5px;
+}
+
+button {
+    padding: 10px;
+    background: #ff9800;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #e65100;
+}
+
+input, select {
+    padding: 8px;
+    margin: 5px 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.search-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.custom-product {
+    margin-top: 20px;
+    padding: 10px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#cartItemsSales, #cartItemsWholesale, #productList, #salesReport {
+    margin-top: 10px;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#salesReport div {
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#totalAmountSales, #totalAmountWholesale {
+    font-weight: bold;
+    margin-top: 10px;
+}

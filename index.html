@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>মা ডিজিটাল স্টুডিও - স্টোর ম্যানেজমেন্ট</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>মা ডিজিটাল স্টুডিও</h1>
+        <p>ধলাপাড়া বাজার, ঘাটাইল, টাংগাইল</p>
+        <p>মোবাইল: +8801710-065644</p>
+    </header>
+
+    <div class="container">
+        <!-- সাইড মেনু -->
+        <aside>
+            <button onclick="showSection('sales')">হোম</button>
+            <button onclick="showSection('productManagement')">প্রোডাক্ট ম্যানেজমেন্ট</button>
+            <button onclick="showSection('wholesale')">পাইকারি বিক্রি</button>
+            <button onclick="showSection('salesHistory')">বিক্রির হিসাব</button>
+        </aside>
+
+        <!-- মেইন কন্টেন্ট -->
+        <main>
+            <!-- বিক্রয় সেকশন -->
+            <section id="sales">
+                <h2>বিক্রয়</h2>
+                <label>কাস্টমারের নাম:</label>
+                <input type="text" id="customerName">
+                <div class="search-container">
+                    <input type="text" id="searchProductSales" placeholder="পন্য খুঁজুন" oninput="searchProductSales()">
+                    <select id="productSelectSales"></select>
+                </div>
+                <label>পরিমাণ:</label>
+                <input type="number" id="quantitySales" min="1" value="1">
+                <button onclick="addToCartSales()">কার্টে যোগ করুন</button>
+
+                <!-- কাস্টম পণ্য যোগ করার অপশন -->
+                <div class="custom-product">
+                    <h3>কাস্টম পণ্য যোগ করুন</h3>
+                    <input type="text" id="customProductName" placeholder="পণ্যের নাম">
+                    <input type="number" id="customProductPrice" placeholder="দাম">
+                    <input type="number" id="customProductQuantity" placeholder="পরিমাণ">
+                    <button onclick="addCustomProductSales()">কার্টে যোগ করুন</button>
+                </div>
+
+                <h3>কার্ট</h3>
+                <div id="cartItemsSales"></div>
+                <p id="totalAmountSales">মোট মূল্য: 0 টাকা</p>
+                <label>ডিসকাউন্ট (টাকা):</label>
+                <input type="number" id="discountSales" min="0" value="0">
+                <button onclick="generateBillSales()">জেনারেট বিল</button>
+                <button onclick="clearCartSales()">নতুন বিল</button>
+            </section>
+
+            <!-- প্রোডাক্ট ম্যানেজমেন্ট -->
+            <section id="productManagement" class="hidden">
+                <h2>প্রোডাক্ট ম্যানেজমেন্ট</h2>
+                <input type="text" id="productName" placeholder="পণ্যের নাম">
+                <input type="number" id="productPrice" placeholder="মূল্য">
+                <input type="file" id="productImage">
+                <button onclick="addProduct()">নতুন পণ্য যোগ করুন</button>
+                <h3>প্রোডাক্ট তালিকা</h3>
+                <div id="productList"></div>
+            </section>
+
+            <!-- পাইকারি বিক্রি -->
+            <section id="wholesale" class="hidden">
+                <h2>পাইকারি বিক্রি</h2>
+                <label>কাস্টমারের নাম:</label>
+                <input type="text" id="customerNameWholesale">
+                <div class="search-container">
+                    <input type="text" id="searchProductWholesale" placeholder="পন্য খুঁজুন" oninput="searchProductWholesale()">
+                    <select id="productSelectWholesale"></select>
+                </div>
+                <label>পরিমাণ:</label>
+                <input type="number" id="quantityWholesale" min="1" value="1">
+                <label>কাস্টম দাম:</label>
+                <input type="number" id="customPriceWholesale" placeholder="কাস্টম দাম">
+                <button onclick="addToCartWholesale()">কার্টে যোগ করুন</button>
+
+                <!-- কাস্টম পণ্য যোগ করার অপশন -->
+                <div class="custom-product">
+                    <h3>কাস্টম পণ্য যোগ করুন</h3>
+                    <input type="text" id="customProductNameWholesale" placeholder="পণ্যের নাম">
+                    <input type="number" id="customProductPriceWholesale" placeholder="দাম">
+                    <input type="number" id="customProductQuantityWholesale" placeholder="পরিমাণ">
+                    <button onclick="addCustomProductWholesale()">কার্টে যোগ করুন</button>
+                </div>
+
+                <h3>কার্ট</h3>
+                <div id="cartItemsWholesale"></div>
+                <p id="totalAmountWholesale">মোট মূল্য: 0 টাকা</p>
+                <label>ডিসকাউন্ট (টাকা):</label>
+                <input type="number" id="discountWholesale" min="0" value="0">
+                <button onclick="generateBillWholesale()">জেনারেট বিল</button>
+                <button onclick="clearCartWholesale()">নতুন বিল</button>
+            </section>
+
+            <!-- বিক্রির হিসাব -->
+            <section id="salesHistory" class="hidden">
+                <h2>বিক্রির হিসাব</h2>
+                <input type="text" id="searchSalesHistory" placeholder="কাস্টমার বা পণ্যের নাম সার্চ করুন" oninput="searchSalesHistory()">
+                <button onclick="showDailySales()">দৈনিক হিসাব</button>
+                <button onclick="showMonthlySales()">মাসিক হিসাব</button>
+                <div id="salesReport"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
